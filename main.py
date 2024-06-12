@@ -13,10 +13,10 @@ intents.messages = True  # Enable privileged message content intent
 intents.guilds = True  # Enable privileged guilds intent
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# You need to configre all these to fit your specifications.
+# You need to configure all these to fit your specifications.
 bot_token = "" # Type your Discord Bot token here.
 join_leave_channel_id = 1234567890 # Type the channel ID on Discord where you want it to output the join/leave messages. You find this by Enabling Discord Developer Mode and right-clicking a channel and Copy ID.
-allowed_user_ids = ['1237', '2345', '2347'] # Discord User IDs that is allowed to use the !playerlist command.
+allowed_user_ids = ['1237', '2345', '2347'] # Discord User IDs that are allowed to use the !playerlist command.
 ip = "123.123.123.123" # IP of the FiveM Server
 port = 30120 # Port of FiveM server. Default is 30120
 
@@ -52,7 +52,10 @@ async def fivem_join_leave():
         # If the player is not in the old status, they have just joined
         if player not in old_status:
             old_status[player] = current_time
-            await bot.get_channel(join_leave_channel_id).send(f":green_square:  ``{player}``")
+            try:
+                await bot.get_channel(discord_channel_id).send(f":green_square:  ``{player}``")
+            except Exception as e:
+                print(f"Error sending message: {e}")
 
     for player, join_time in list(old_status.items()):
         if player not in new_players:
@@ -60,9 +63,11 @@ async def fivem_join_leave():
             duration = current_time - join_time
             hours, remainder = divmod(duration, 3600)
             minutes, _ = divmod(remainder, 60)
-            await bot.get_channel(join_leave_channel_id).send(
-                f":red_square: ``{player}`` (Online for {int(hours)} hours and {int(minutes)} minutes)")
-            del old_status[player]
+            try:
+                await bot.get_channel(discord_channel_id).send(f":red_square: ``{player}`` (Online for {int(hours)} hours and {int(minutes)} minutes)")
+                del old_status[player]
+            except Exception as e:
+                print(f"Error sending message: {e}")
 
     # Save the new status to the file
     with open(status_file, 'w') as file:
