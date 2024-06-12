@@ -1,4 +1,5 @@
 import os
+import asyncio
 import json
 import time
 from fivem import FiveM
@@ -76,10 +77,18 @@ async def fivem_join_leave():
 async def fivem_player_list():
     fivem = FiveM(ip=ip, port=port)
 
-    players = await fivem.get_players()
-    # Extract and sort the player names
-    player_names = sorted([player.name for player in players])
-    return player_names
+    for _ in range(3):  # Try 3 times
+        try:
+            players = await fivem.get_players()
+            # Extract and sort the player names
+            player_names = sorted([player.name for player in players])
+            return player_names
+        except Exception as e:
+            print(f"Error getting player list: {e}")
+            await asyncio.sleep(10)  # Wait for 10 seconds before retrying
+
+    print("Failed to get player list after 3 attempts")
+    return []
 
 @bot.event
 async def on_ready():
