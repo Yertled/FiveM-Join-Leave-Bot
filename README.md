@@ -2,6 +2,9 @@
 
 This is a Discord bot that interacts with a FiveM server. It provides a command to list the current players on the server and a task that checks the server for player joins and leaves every minute.
 
+![image](https://github.com/Yertled/FiveM-Join-Leave-Bot/assets/12172847/34bb4615-ee9d-4494-931b-e9cb44c112ec)
+
+
 ## Features
 
 - **Player List Command**: The `!playerlist` command lists the current players on the FiveM server. Only users with their IDs in the `allowed_user_ids` list can use this command.
