@@ -9,6 +9,7 @@ This is a Discord bot that interacts with a FiveM server. It provides a command 
 
 - **Player List Command**: The `!playerlist` command lists the current players on the FiveM server. Only users with their IDs in the `allowed_user_ids` list can use this command.
 - **Join/Leave Notifications**: The bot sends a message to a specified Discord channel whenever a player joins or leaves the FiveM server.
+- **Player Count**: The bot's Discord Status updates every minute with the amount of players currently online on the server.
 
 ## Setup
 
