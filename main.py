@@ -2,7 +2,7 @@ import os
 import asyncio
 import json
 import time
-from fivem import FiveM
+from fivem import FiveM # async-fivem package
 import discord
 from discord.ext import commands, tasks
 
@@ -17,11 +17,11 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # You need to configure all these to fit your specifications.
 bot_token = "" # Type your Discord Bot token here.
 join_leave_channel_id = 1234567890 # Type the channel ID on Discord where you want it to output the join/leave messages. You find this by Enabling Discord Developer Mode and right-clicking a channel and Copy ID.
-allowed_user_ids = ['1237', '2345', '2347'] # Discord User IDs that are allowed to use the !playerlist command.
+allowed_user_ids = [1237, 2345, 2347] # Discord User IDs that are allowed to use the !playerlist command.
 ip = "123.123.123.123" # IP of the FiveM Server
 port = 30120 # Port of FiveM server. Default is 30120
 
-# Command to generate a coupon
+# Command to output all online players.
 @bot.command()
 async def playerlist(ctx):
     user_id = str(ctx.author.id)
@@ -33,7 +33,7 @@ async def playerlist(ctx):
     else:
         await ctx.send("Sorry, you don't have permission to use this command.")
 
-#A task that checks the server list every minute, can increase/decrease this as needed.
+# A task that checks the server list every minute, can increase/decrease this as needed.
 @tasks.loop(minutes=1)
 async def fivem_join_leave():
     print("Checking online players...") # Debugging, you can remove this line.
@@ -74,6 +74,14 @@ async def fivem_join_leave():
     with open(status_file, 'w') as file:
         json.dump(old_status, file)
 
+# Checks online players every minute and sets it as discord status.
+@tasks.loop(minutes=1)
+async def playercount_status():
+    players = await fivem_player_list(ip, port)
+    online_player_count = len(players)
+    await bot.change_presence(activity=discord.Game(name=f"FiveM Online Players: {online_player_count}/200"))
+
+# A function to get the current online players from a server.
 async def fivem_player_list():
     fivem = FiveM(ip=ip, port=port)
 
@@ -90,10 +98,12 @@ async def fivem_player_list():
     print("Failed to get player list after 3 attempts")
     return []
 
+# To start the functions
 @bot.event
 async def on_ready():
     print("Bot is ready.")
     fivem_join_leave.start()
+    playercount_status.start()
 
 # Check if the file exists and is not empty
 status_file = 'current_players.json'
